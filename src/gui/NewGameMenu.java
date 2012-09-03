@@ -274,7 +274,7 @@ public class NewGameMenu extends JPanel
 							JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE))
 					{
 					case JOptionPane.YES_OPTION:
-						GUIUtility.installAIFiles(aiComboBox, NewGameMenu.this, getAIFiles());
+						GUIUtility.installAIFiles(aiComboBox, getAIFiles());
 						break;
 					case JOptionPane.NO_OPTION:
 						break;
@@ -287,7 +287,7 @@ public class NewGameMenu extends JPanel
 					@Override
 					public void actionPerformed(ActionEvent event)
 					{
-						GUIUtility.installAIFiles(aiComboBox, NewGameMenu.this, getAIFiles());
+						GUIUtility.installAIFiles(aiComboBox, getAIFiles());
 					}
 				});
 
@@ -402,7 +402,15 @@ public class NewGameMenu extends JPanel
 			}
 		});
 
-		GUIUtility.setupReturnToMainButton(m_returnToMainButton);
+		m_returnToMainButton.setToolTipText("Press me to go back to the Main Menu");
+		m_returnToMainButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				Driver.getInstance().revertToMainPanel();
+			}
+		});
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBorder(BorderFactory.createLoweredBevelBorder());
