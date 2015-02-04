@@ -35,13 +35,15 @@ public final class Game {
 
         mStatus = Status.CONTINUE;
 
-        mHistory = new History(gameType, new ArrayList<Move>());
+        mHistory = history != null ? history : new History(gameType, new ArrayList<Move>());
         if (history != null) {
             Preconditions.checkArgument(gameType.equals(history.variantName),
                     "History variantName {" + history.variantName + "} does not match gameType {" + gameType + "}");
 
-            for (Move move : history.moves) {
-                executeMove(move);
+            if (!mHistory.isComplete()) {
+                for (Move move : history.moves) {
+                    executeMove(move);
+                }
             }
         }
     }
@@ -159,7 +161,7 @@ public final class Game {
 
         if (move.promotionType != null) {
             Piece promotedPiece = team.getPiecePromoter().promotePiece(board.getPiece(move.destination),
-                    PieceTypeManager.INSTANCE.getPieceTypeByName(move.promotionType));
+                    PieceTypeManager.INSTANCE.getPieceTypeById(move.promotionType));
             board.addPiece(promotedPiece, move.destination);
         }
 
@@ -207,8 +209,9 @@ public final class Game {
         // TODO: test this more closely to make sure it's correct
         mStatus = team.getEndCondition().checkEndCondition(this);
 
+        Move opponentsLastMove = getOpponentsLastMove();
         for (PostMoveAction action : team.getPostMoveActions()) {
-            action.undo(board, team, move, mHistory.moves.isEmpty() ? null : mHistory.moves.get(mHistory.moves.size() - 1));
+            action.undo(board, team, move, opponentsLastMove);
         }
 
         if (move.promotionType != null) {
@@ -231,5 +234,14 @@ public final class Game {
             }
         }
         throw new IllegalArgumentException("invalid teamId");
+    }
+
+    @Nullable
+    private Move getOpponentsLastMove() {
+        if (mHistory.isComplete()) {
+            return mHistoryIndex == 0 ? null : mHistory.moves.get(mHistoryIndex - 1);
+        } else {
+            return mHistory.moves.isEmpty() ? null : mHistory.moves.get(mHistory.moves.size() - 1);
+        }
     }
 }

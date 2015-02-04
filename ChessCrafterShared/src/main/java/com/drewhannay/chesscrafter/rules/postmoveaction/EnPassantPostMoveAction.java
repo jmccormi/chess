@@ -90,11 +90,18 @@ public final class EnPassantPostMoveAction extends PostMoveAction {
             return;
         }
 
+        // must have captured a pawn
+        if (!isPawn(capturedPiece)) {
+            // "re-capture" the piece
+            team.capturePiece(lastMove, capturedPiece);
+            return;
+        }
+
         board.addPiece(capturedPiece, opponentsLastMove.destination);
     }
 
     private boolean isPawn(Piece piece) {
-        return piece.getName().equals(PieceTypeManager.getNorthFacingPawnPieceType().getName())
-                || piece.getName().equals(PieceTypeManager.getSouthFacingPawnPieceType().getName());
+        return piece.getInternalId().equals(PieceTypeManager.getNorthFacingPawnPieceType().getInternalId())
+                || piece.getInternalId().equals(PieceTypeManager.getSouthFacingPawnPieceType().getInternalId());
     }
 }
